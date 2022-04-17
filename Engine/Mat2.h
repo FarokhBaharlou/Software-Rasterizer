@@ -97,9 +97,10 @@ _Vec2<T>& operator*=( _Vec2<T>& lhs,const _Mat2<T>& rhs )
 template<typename T>
 _Vec2<T> operator*( const _Vec2<T>& lhs,const _Mat2<T>& rhs )
 {
-	return { 
-		lhs.x * rhs.elements[0][0] + lhs.y * rhs.elements[0][1],
-		lhs.x * rhs.elements[1][0] + lhs.y * rhs.elements[1][1]
+	return 
+	{ 
+		lhs.x* rhs.elements[0][0] + lhs.y * rhs.elements[1][0],
+		lhs.x* rhs.elements[0][1] + lhs.y * rhs.elements[1][1]
 	};
 }
 
