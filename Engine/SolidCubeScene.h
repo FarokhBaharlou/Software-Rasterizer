@@ -8,7 +8,7 @@
 class SolidCubeScene : public Scene
 {
 public:
-	SolidCubeScene() = default;
+	SolidCubeScene() : Scene("Solid Cube Different Colored Triangles") {}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
 		if (kbd.KeyIsPressed('Q'))

@@ -144,8 +144,15 @@
     <ClInclude Include="ConHexScene.h" />
     <ClInclude Include="ConHexWireScene.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="CubeFolded.h" />
+    <ClInclude Include="CubeFoldedWrap.h" />
     <ClInclude Include="CubeOrderScene.h" />
+    <ClInclude Include="CubeSkinned.h" />
+    <ClInclude Include="CubeSkinnedScene.h" />
     <ClInclude Include="DXErr.h" />
+    <ClInclude Include="FoldedCubeScene.h" />
+    <ClInclude Include="FoldedCubeWrapScene.h" />
+    <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GDIPlusManager.h" />
     <ClInclude Include="Graphics.h" />
@@ -162,6 +169,9 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SolidCubeScene.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="TexCubeScene.h" />
+    <ClInclude Include="TexVertex.h" />
+    <ClInclude Include="TexWrapCubeScene.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
     <ClInclude Include="XMutualScene.h" />
@@ -169,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp" />
+    <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GDIPlusManager.cpp" />
     <ClCompile Include="Graphics.cpp" />

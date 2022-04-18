@@ -1,15 +1,15 @@
 #pragma once
-#pragma once
 
 #include "Scene.h"
-#include "XQuads.h"
+#include "Cube.h"
 #include "NDCtoScreenTransformer.h"
 #include "Mat3.h"
 
-class XMutualScene : public Scene
+class TexWrapCubeScene : public Scene
 {
 public:
-	XMutualScene() : Scene("Weird X Shape Self Mutual Intersecting Planes Bullshit") {}
+	TexWrapCubeScene(const std::wstring& texname, float texdim) : sbTex(Surface::FromFile(texname)), cube(1.0f, texdim), Scene(std::string("Textured Cube ") + std::string(texname.begin(), texname.end()) + " Wrapping Dim: " + std::to_string(texdim)) {}
+	TexWrapCubeScene(float texdim) : cube(1.0f, texdim), Scene(std::string("Textured Cube Butthole Sauron Wrapping Dim: ") + std::to_string(texdim)) {}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
 		if (kbd.KeyIsPressed('Q'))
@@ -47,48 +47,44 @@ public:
 	}
 	virtual void Draw(Graphics& gfx) const override
 	{
+		// NOTE: Changes had to be made because of Vec3 -> TexVertex
 		// generate indexed triangle list
-		auto triangles = hex.GetTriangles();
+		auto triangles = cube.GetTrianglesTex();
 		// generate rotation matrix from euler angles
 		const Mat3 rot = Mat3::RotationX(theta_x) * Mat3::RotationY(theta_y) * Mat3::RotationZ(theta_z);
 		// transform from model space -> world (/view) space
 		for (auto& v : triangles.vertices)
 		{
-			v *= rot;
-			v += { 0.0f, 0.0f, offset_z };
+			v.pos *= rot;
+			v.pos += { 0.0f, 0.0f, offset_z };
 		}
 		// backface culling test (must be done in world (/view) space)
 		for (size_t i = 0, end = triangles.indices.size() / 3; i < end; i++)
 		{
-			const Vec3& v0 = triangles.vertices[triangles.indices[i * 3]];
-			const Vec3& v1 = triangles.vertices[triangles.indices[i * 3 + 1]];
-			const Vec3& v2 = triangles.vertices[triangles.indices[i * 3 + 2]];
+			const Vec3& v0 = triangles.vertices[triangles.indices[i * 3]].pos;
+			const Vec3& v1 = triangles.vertices[triangles.indices[i * 3 + 1]].pos;
+			const Vec3& v2 = triangles.vertices[triangles.indices[i * 3 + 2]].pos;
 			triangles.cullFlags[i] = (v1 - v0) % (v2 - v0) * v0 > 0.0f;
 		}
 		// transform to screen space (includes perspective transform)
 		for (auto& v : triangles.vertices)
 		{
-			nts.Transform(v);
+			nts.Transform(v.pos);
 		}
-		// draw the triangles
+		// draw the mf triangles!
 		for (size_t i = 0, end = triangles.indices.size() / 3; i < end; i++)
 		{
 			// skip triangles previously determined to be back-facing
 			if (!triangles.cullFlags[i])
 			{
-				gfx.DrawTriangle(triangles.vertices[triangles.indices[i * 3]], triangles.vertices[triangles.indices[i * 3 + 1]], triangles.vertices[triangles.indices[i * 3 + 2]], colors[i]);
+				gfx.DrawTriangleTexWrap(triangles.vertices[triangles.indices[i * 3]], triangles.vertices[triangles.indices[i * 3 + 1]], triangles.vertices[triangles.indices[i * 3 + 2]], sbTex);
 			}
 		}
 	}
 private:
 	NDCtoScreenTransformer nts;
-	XQuads hex = XQuads(1.0f);
-	static constexpr Color colors[12] = {
-		Colors::Red,
-		Colors::Red,
-		Colors::Yellow,
-		Colors::Yellow,
-	};
+	Cube cube;
+	Surface sbTex = Surface::FromFile(L"Images\\sauron-bhole-100x100.png");
 	static constexpr float dTheta = PI;
 	float offset_z = 2.0f;
 	float theta_x = 0.0f;

@@ -25,6 +25,12 @@
 #include "ConHexScene.h"
 #include "ConHexWireScene.h"
 #include "XMutualScene.h"
+#include "TexCubeScene.h"
+#include "TexWrapCubeScene.h"
+#include "FoldedCubeScene.h"
+#include "FoldedCubeWrapScene.h"
+#include "CubeSkinnedScene.h"
+#include <sstream>
 
 Game::Game( MainWindow& wnd ) : wnd( wnd ), gfx(wnd)
 {
@@ -33,7 +39,18 @@ Game::Game( MainWindow& wnd ) : wnd( wnd ), gfx(wnd)
 	scenes.push_back(std::make_unique<ConHexScene>());
 	scenes.push_back(std::make_unique<ConHexWireScene>());
 	scenes.push_back(std::make_unique<XMutualScene>());
+	scenes.push_back(std::make_unique<TexCubeScene>());
+	scenes.push_back(std::make_unique<TexCubeScene>(2.0f));
+	scenes.push_back(std::make_unique<TexWrapCubeScene>(2.0f));
+	scenes.push_back(std::make_unique<TexWrapCubeScene>(6.0f));
+	scenes.push_back(std::make_unique<TexWrapCubeScene>(L"images\\wood.jpg", 2.0f));
+	scenes.push_back(std::make_unique<FoldedCubeScene>());
+	scenes.push_back(std::make_unique<FoldedCubeWrapScene>());
+	scenes.push_back(std::make_unique<CubeSkinnedScene>(L"images\\dice_skin.png"));
+	scenes.push_back(std::make_unique<CubeSkinnedScene>(L"images\\office_skin.jpg"));
+	scenes.push_back(std::make_unique<CubeSkinnedScene>(L"images\\office_skin_lores.png"));
 	curScene = scenes.begin();
+	OutputSceneName();
 }
 
 void Game::Go()
@@ -46,14 +63,25 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	const float dt = 1.0f / 60.0f;
+	const float dt = ft.Mark();
 	// cycle through scenes when tab is pressed
 	while (!wnd.kbd.KeyIsEmpty())
 	{
 		const auto e = wnd.kbd.ReadKey();
 		if (e.GetCode() == VK_TAB && e.IsPress())
 		{
-			CycleScenes();
+			if (wnd.kbd.KeyIsPressed(VK_SHIFT))
+			{
+				ReverseCycleScenes();
+			}
+			else
+			{
+				CycleScenes();
+			}
+		}
+		else if (e.GetCode() == VK_ESCAPE && e.IsPress())
+		{
+			wnd.Kill();
 		}
 	}
 	// update scene
@@ -66,6 +94,29 @@ void Game::CycleScenes()
 	{
 		curScene = scenes.begin();
 	}
+	OutputSceneName();
+}
+
+void Game::ReverseCycleScenes()
+{
+	if (curScene == scenes.begin())
+	{
+		curScene = scenes.end() - 1;
+	}
+	else
+	{
+		--curScene;
+	}
+	OutputSceneName();
+}
+
+void Game::OutputSceneName() const
+{
+	std::stringstream ss;
+	const std::string stars((*curScene)->GetName().size() + 4, '*');
+
+	ss << stars << std::endl << "* " << (*curScene)->GetName() << " *" << std::endl << stars << std::endl;
+	OutputDebugStringA(ss.str().c_str());
 }
 
 void Game::ComposeFrame()

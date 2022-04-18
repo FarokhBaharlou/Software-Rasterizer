@@ -26,7 +26,7 @@ public:
 			 3,0, 3,4, 1,4, 2,4, 4,0}
 		};
 	}
-	IndexedTriangleList GetTriangles() const
+	IndexedTriangleList<Vec3> GetTriangles() const
 	{
 		return{
 			vertices,
