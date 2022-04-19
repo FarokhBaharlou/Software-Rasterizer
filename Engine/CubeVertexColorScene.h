@@ -4,18 +4,24 @@
 #include "Cube.h"
 #include "Mat3.h"
 #include "Pipeline.h"
-#include "TextureEffect.h"
+#include "VertexColorEffect.h"
 
-// scene demonstrating skinned cube
-class CubeSkinScene : public Scene
+class CubeVertexColorScene : public Scene
 {
 public:
-	typedef Pipeline<TextureEffect> Pipeline;
+	typedef Pipeline<VertexColorEffect> Pipeline;
 	typedef Pipeline::Vertex Vertex;
 public:
-	CubeSkinScene(Graphics& gfx, const std::wstring& filename) : itlist(Cube::GetSkinned<Vertex>()), pipeline(gfx), Scene("Textured Cube skinned using texture: " + std::string(filename.begin(), filename.end()))
+	CubeVertexColorScene(Graphics& gfx) : itlist(Cube::GetPlain<Vertex>()), pipeline(gfx), Scene("Colored cube vertex gradient scene")
 	{
-		pipeline.effect.ps.BindTexture(filename);
+		itlist.vertices[0].color = Vec3(Colors::Red);
+		itlist.vertices[1].color = Vec3(Colors::Green);
+		itlist.vertices[2].color = Vec3(Colors::Blue);
+		itlist.vertices[3].color = Vec3(Colors::Yellow);
+		itlist.vertices[4].color = Vec3(Colors::Cyan);
+		itlist.vertices[5].color = Vec3(Colors::Magenta);
+		itlist.vertices[6].color = Vec3(Colors::White);
+		itlist.vertices[7].color = Vec3(Colors::Black);
 	}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
