@@ -54,6 +54,7 @@ public:
 	}
 	virtual void Draw() override
 	{
+		pipeline.BeginFrame();
 		// generate rotation matrix from euler angles
 		// translation from offset
 		const Mat3 rot = Mat3::RotationX(theta_x) * Mat3::RotationY(theta_y) * Mat3::RotationZ(theta_z);

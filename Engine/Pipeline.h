@@ -6,6 +6,7 @@
 #include "IndexedTriangleList.h"
 #include "NDCtoScreenTransformer.h"
 #include "Mat3.h"
+#include "ZBuffer.h"
 #include <algorithm>
 
 // triangle drawing pipeline with programable
@@ -17,7 +18,7 @@ public:
 	// vertex type used for geometry and throughout pipeline
 	typedef typename Effect::Vertex Vertex;
 public:
-	Pipeline(Graphics& gfx) : gfx(gfx) {}
+	Pipeline(Graphics& gfx) : gfx(gfx), zb(gfx.ScreenWidth, gfx.ScreenHeight) {}
 	void Draw(IndexedTriangleList<Vertex>& triList)
 	{
 		ProcessVertices(triList.vertices, triList.indices);
@@ -29,6 +30,11 @@ public:
 	void BindTranslation(const Vec3& translation_in)
 	{
 		translation = translation_in;
+	}
+	// needed to reset the z-buffer after each frame
+	void BeginFrame()
+	{
+		zb.Clear();
 	}
 private:
 	// vertex processing function
@@ -170,7 +176,7 @@ private:
 	}
 	// does processing common to both flat top and flat bottom tris
 	// scan over triangle in screen space, interpolate attributes,
-	// invoke ps and write pixel to screen
+	// depth cull, invoke ps and write pixel to screen
 	void DrawFlatTriangle(const Vertex& it0, const Vertex& it1, const Vertex& it2, const Vertex& dv0, const Vertex& dv1, Vertex itEdge1)
 	{
 		// create edge interpolant for left edge (always v0)
@@ -206,13 +212,18 @@ private:
 			{
 				// recover interpolated z from interpolated 1/z
 				const float z = 1.0f / iLine.pos.z;
-				// recover interpolated attributes
-				// (wasted effort in multiplying pos (x,y,z) here, but
-				//  not a huge deal, not worth the code complication to fix)
-				const auto attr = iLine * z;
-				// invoke pixel shader with interpolated vertex attributes
-				// and use result to set the pixel color on the screen
-				gfx.PutPixel(x, y, effect.ps(attr));
+				// do z rejection / update of z buffer
+				// skip shading step if z rejected (early z)
+				if (zb.TestAndSet(x, y, z))
+				{
+					// recover interpolated attributes
+					// (wasted effort in multiplying pos (x,y,z) here, but
+					//  not a huge deal, not worth the code complication to fix)
+					const auto attr = iLine * z;
+					// invoke pixel shader with interpolated vertex attributes
+					// and use result to set the pixel color on the screen
+					gfx.PutPixel(x, y, effect.ps(attr));
+				}
 			}
 		}
 	}
@@ -221,6 +232,7 @@ public:
 private:
 	Graphics& gfx;
 	NDCtoScreenTransformer nts;
+	ZBuffer zb;
 	Mat3 rotation;
 	Vec3 translation;
 };
