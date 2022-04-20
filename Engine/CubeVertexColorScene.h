@@ -66,8 +66,8 @@ public:
 		const Mat3 rot = Mat3::RotationX(theta_x) * Mat3::RotationY(theta_y) * Mat3::RotationZ(theta_z);
 		const Vec3 trans = { 0.0f,0.0f,offset_z };
 		// set pipeline transform
-		pipeline.BindRotation(rot);
-		pipeline.BindTranslation(trans);
+		pipeline.effect.vs.BindRotation(rot);
+		pipeline.effect.vs.BindTranslation(trans);
 		// render triangles
 		pipeline.Draw(itlist);
 	}

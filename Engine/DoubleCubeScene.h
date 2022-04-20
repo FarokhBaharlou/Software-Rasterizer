@@ -65,8 +65,8 @@ public:
 			// rotate in opposition to mobile cube
 			const Mat3 rot = Mat3::RotationX(-theta_x) * Mat3::RotationY(-theta_y) * Mat3::RotationZ(-theta_z);
 			// set pipeline transform
-			pipeline.BindRotation(rot);
-			pipeline.BindTranslation({ 0.0f,0.0f,2.0f });
+			pipeline.effect.vs.BindRotation(rot);
+			pipeline.effect.vs.BindTranslation({ 0.0f,0.0f,2.0f });
 			// render triangles
 			pipeline.Draw(itlist);
 		}
@@ -75,8 +75,8 @@ public:
 			// generate rotation matrix from euler angles
 			const Mat3 rot = Mat3::RotationX(theta_x) * Mat3::RotationY(theta_y) * Mat3::RotationZ(theta_z);
 			// set pipeline transform
-			pipeline.BindRotation(rot);
-			pipeline.BindTranslation({ 0.0f,0.0f,offset_z });
+			pipeline.effect.vs.BindRotation(rot);
+			pipeline.effect.vs.BindTranslation({ 0.0f,0.0f,offset_z });
 			// render triangles
 			pipeline.Draw(itlist);
 		}

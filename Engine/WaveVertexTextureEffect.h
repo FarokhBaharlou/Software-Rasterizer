@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Pipeline.h"
-#include "DefaultVertexShader.h"
+#include <cmath>
 
-// basic texture effect
-class TextureEffect
+class WaveVertexTextureEffect
 {
 public:
-	// the vertex type that will be input into the pipeline
 	class Vertex
 	{
 	public:
@@ -59,13 +57,40 @@ public:
 		Vec3 pos;
 		Vec2 t;
 	};
-	// default vs rotates and translates vertices
-	// does not touch attributes
-	typedef DefaultVertexShader<Vertex> VertexShader;
-	// invoked for each pixel of a triangle
-	// takes an input of attributes that are the
-	// result of interpolating vertex attributes
-	// and outputs a color
+	// perturbes vertices in y axis in sin wave based on
+	// x position and time
+	class VertexShader
+	{
+	public:
+		typedef Vertex Output;
+	public:
+		void BindRotation(const Mat3& rotation_in)
+		{
+			rotation = rotation_in;
+		}
+		void BindTranslation(const Vec3& translation_in)
+		{
+			translation = translation_in;
+		}
+		Output operator()(const Vertex& in) const
+		{
+			Vec3 pos = in.pos * rotation + translation;
+			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
+			return{ pos,in.t };
+		}
+		void SetTime(float t)
+		{
+			time = t;
+		}
+	private:
+		Mat3 rotation;
+		Vec3 translation;
+		float time = 0.0f;
+		float freqWave = 10.0f;
+		float freqScroll = 5.0f;
+		float amplitude = 0.05f;
+	};
+	// texture clamped ps
 	class PixelShader
 	{
 	public:
