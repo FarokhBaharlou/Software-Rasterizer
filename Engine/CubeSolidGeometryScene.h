@@ -4,22 +4,17 @@
 #include "Cube.h"
 #include "Mat3.h"
 #include "Pipeline.h"
-#include "SolidEffect.h"
+#include "SolidGeometryEffect.h"
 
-class CubeSolidScene : public Scene
+class CubeSolidGeometryScene : public Scene
 {
 public:
-	typedef Pipeline<SolidEffect> Pipeline;
+	typedef Pipeline<SolidGeometryEffect> Pipeline;
 	typedef Pipeline::Vertex Vertex;
 public:
-	CubeSolidScene(Graphics& gfx) : itlist(Cube::GetPlainIndependentFaces<Vertex>()), pipeline(gfx), Scene("Colored cube solid independent faces scene")
+	CubeSolidGeometryScene(Graphics& gfx) : itlist(Cube::GetPlain<Vertex>()), pipeline(gfx), Scene("Colored cube geometry solid face scene")
 	{
-		const Color colors[] = { Colors::Red,Colors::Green,Colors::Blue,Colors::Magenta,Colors::Yellow,Colors::Cyan };
-
-		for (int i = 0; i < itlist.vertices.size(); i++)
-		{
-			itlist.vertices[i].color = colors[i / 4];
-		}
+		pipeline.effect.gs.BindColors({ Colors::Red,Colors::Green,Colors::Blue,Colors::Magenta,Colors::Yellow,Colors::Cyan });
 	}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{

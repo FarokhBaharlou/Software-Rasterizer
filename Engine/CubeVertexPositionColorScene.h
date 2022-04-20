@@ -12,7 +12,7 @@ public:
 	typedef Pipeline<VertexPositionColorEffect> Pipeline;
 	typedef Pipeline::Vertex Vertex;
 public:
-	CubeVertexPositionColorScene(Graphics& gfx) : itlist(Cube::GetPlain<Vertex>()), pipeline(gfx), Scene("Colored cube vertex gradient scene") {}
+	CubeVertexPositionColorScene(Graphics& gfx) : itlist(Cube::GetPlain<Vertex>()), pipeline(gfx), Scene("Cube vertex position color scene") {}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
 		if (kbd.KeyIsPressed('Q'))

@@ -12,7 +12,7 @@ public:
 	typedef Pipeline<SolidEffect> Pipeline;
 	typedef Pipeline::Vertex Vertex;
 public:
-	DoubleCubeScene(Graphics& gfx) : itlist(Cube::GetPlainIndependentFaces<Vertex>()), pipeline(gfx), Scene("Colored cube vertex gradient scene")
+	DoubleCubeScene(Graphics& gfx) : itlist(Cube::GetPlainIndependentFaces<Vertex>()), pipeline(gfx), Scene("Double cube interpenetration test scene")
 	{
 		const Color colors[] = { Colors::Red,Colors::Green,Colors::Blue,Colors::Magenta,Colors::Yellow,Colors::Cyan };
 

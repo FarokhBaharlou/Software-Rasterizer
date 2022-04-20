@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Pipeline.h"
+#include "DefaultGeometryShader.h"
 #include <cmath>
 
 class WaveVertexTextureEffect
@@ -90,6 +91,8 @@ public:
 		float freqScroll = 5.0f;
 		float amplitude = 0.05f;
 	};
+	// default gs passes vertices through and outputs triangle
+	typedef DefaultGeometryShader<VertexShader::Output> GeometryShader;
 	// texture clamped ps
 	class PixelShader
 	{
@@ -116,5 +119,6 @@ public:
 	};
 public:
 	VertexShader vs;
+	GeometryShader gs;
 	PixelShader ps;
 };
