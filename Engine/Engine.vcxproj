@@ -156,6 +156,8 @@
     <ClInclude Include="GDIPlusManager.h" />
     <ClInclude Include="GeometryFlatEffect.h" />
     <ClInclude Include="GeometryFlatScene.h" />
+    <ClInclude Include="GouraudEffect.h" />
+    <ClInclude Include="GouraudScene.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="Keyboard.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SolidEffect.h" />
     <ClInclude Include="SolidGeometryEffect.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="tiny_obj_loader.h" />

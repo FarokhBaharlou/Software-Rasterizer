@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Pipeline.h"
-#include "DefaultVertexShader.h"
 #include "DefaultGeometryShader.h"
 
 // flat shading with vertex normals
-class VertexFlatEffect
+class GouraudEffect
 {
 public:
 	// the vertex type that will be input into the pipeline
@@ -67,10 +66,11 @@ public:
 			Output() = default;
 			Output(const Vec3& pos) : pos(pos) {}
 			Output(const Vec3& pos, const Output& src) : color(src.color), pos(pos) {}
-			Output(const Vec3& pos, const Color& color) : color(color), pos(pos) {}
+			Output(const Vec3& pos, const Vec3& color) : color(color), pos(pos) {}
 			Output& operator+=(const Output& rhs)
 			{
 				pos += rhs.pos;
+				color += rhs.color;
 				return *this;
 			}
 			Output operator+(const Output& rhs) const
@@ -80,6 +80,7 @@ public:
 			Output& operator-=(const Output& rhs)
 			{
 				pos -= rhs.pos;
+				color -= rhs.color;
 				return *this;
 			}
 			Output operator-(const Output& rhs) const
@@ -89,6 +90,7 @@ public:
 			Output& operator*=(float rhs)
 			{
 				pos *= rhs;
+				color *= rhs;
 				return *this;
 			}
 			Output operator*(float rhs) const
@@ -98,6 +100,7 @@ public:
 			Output& operator/=(float rhs)
 			{
 				pos /= rhs;
+				color /= rhs;
 				return *this;
 			}
 			Output operator/(float rhs) const
@@ -106,7 +109,7 @@ public:
 			}
 		public:
 			Vec3 pos;
-			Color color;
+			Vec3 color;
 		};
 	public:
 		void BindRotation(const Mat3& rotation_in)
@@ -123,7 +126,7 @@ public:
 			const auto d = diffuse * std::max(0.0f, -(v.n * rotation) * dir);
 			// add diffuse+ambient, filter by material color, saturate and scale
 			const auto c = color.GetHadamard(d + ambient).Saturate() * 255.0f;
-			return{ v.pos * rotation + translation,Color(c) };
+			return{ v.pos * rotation + translation,c };
 		}
 		void SetDiffuseLight(const Vec3& c)
 		{
@@ -162,7 +165,7 @@ public:
 		template<class Input>
 		Color operator()(const Input& in) const
 		{
-			return in.color;
+			return Color(in.color);
 		}
 	};
 public:
