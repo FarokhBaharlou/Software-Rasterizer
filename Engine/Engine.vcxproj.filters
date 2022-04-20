@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Effects">
       <UniqueIdentifier>{9074ce9a-a881-449d-b35f-d4149e2f983f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Obj Loader">
+      <UniqueIdentifier>{d4aa8ace-12b0-491d-968f-141fbecee6ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -153,6 +156,24 @@
     <ClInclude Include="CubeSolidGeometryScene.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="VertexFlatEffect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeFlatIndependentScene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryFlatEffect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryFlatScene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files\Obj Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Miniball.h">
+      <Filter>Header Files\Obj Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -184,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="FrameTimer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tiny_obj_loader.cpp">
+      <Filter>Header Files\Obj Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
