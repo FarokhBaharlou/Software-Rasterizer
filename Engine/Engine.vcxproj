@@ -169,6 +169,8 @@
     <ClInclude Include="Miniball.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCtoScreenTransformer.h" />
+    <ClInclude Include="PhongPointEffect.h" />
+    <ClInclude Include="PhongPointScene.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Rect.h" />
