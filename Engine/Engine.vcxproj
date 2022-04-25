@@ -164,8 +164,7 @@
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="Mat2.h" />
-    <ClInclude Include="Mat3.h" />
+    <ClInclude Include="Mat.h" />
     <ClInclude Include="Miniball.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCtoScreenTransformer.h" />
@@ -182,11 +181,13 @@
     <ClInclude Include="SpecularPhongPointScene.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="TestTriangle.h" />
     <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
+    <ClInclude Include="Vec4.h" />
     <ClInclude Include="VertexColorEffect.h" />
     <ClInclude Include="VertexFlatEffect.h" />
     <ClInclude Include="VertexPositionColorEffect.h" />

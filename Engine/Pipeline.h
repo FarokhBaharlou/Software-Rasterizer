@@ -5,7 +5,7 @@
 #include "Triangle.h"
 #include "IndexedTriangleList.h"
 #include "NDCtoScreenTransformer.h"
-#include "Mat3.h"
+#include "Mat.h"
 #include "ZBuffer.h"
 #include <algorithm>
 #include <memory>
@@ -54,6 +54,7 @@ private:
 	// culls (does not send) back facing triangles
 	void AssembleTriangles(const std::vector<VSOut>& vertices, const std::vector<size_t>& indices)
 	{
+		const auto eyepos = Vec4{ 0.0f,0.0f,0.0f,1.0f } * effect.vs.GetProj();
 		// assemble triangles in the stream and process
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++)
 		{
@@ -62,7 +63,7 @@ private:
 			const auto& v1 = vertices[indices[i * 3 + 1]];
 			const auto& v2 = vertices[indices[i * 3 + 2]];
 			// cull backfacing triangles with cross product (%) shenanigans
-			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
+			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * Vec3(v0.pos - eyepos) <= 0.0f)
 			{
 				// process 3 vertices into a triangle
 				ProcessTriangle(v0, v1, v2, i);
@@ -206,16 +207,16 @@ private:
 
 			for (int x = xStart; x < xEnd; x++, iLine += diLine)
 			{
-				// recover interpolated z from interpolated 1/z
-				const float z = 1.0f / iLine.pos.z;
 				// do z rejection / update of z buffer
 				// skip shading step if z rejected (early z)
-				if (pZb->TestAndSet(x, y, z))
+				if (pZb->TestAndSet(x, y, iLine.pos.z))
 				{
+					// recover interpolated z from interpolated 1/z
+					const float w = 1.0f / iLine.pos.w;
 					// recover interpolated attributes
 					// (wasted effort in multiplying pos (x,y,z) here, but
 					//  not a huge deal, not worth the code complication to fix)
-					const auto attr = iLine * z;
+					const auto attr = iLine * w;
 					// invoke pixel shader with interpolated vertex attributes
 					// and use result to set the pixel color on the screen
 					gfx.PutPixel(x, y, effect.ps(attr));

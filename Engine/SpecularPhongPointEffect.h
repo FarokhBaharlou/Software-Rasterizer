@@ -28,9 +28,9 @@ public:
 		{
 		public:
 			Output() = default;
-			Output(const Vec3& pos) : pos(pos) {}
-			Output(const Vec3& pos, const Output& src) : n(src.n), worldPos(src.worldPos), pos(pos) {}
-			Output(const Vec3& pos, const Vec3& n, const Vec3& worldPos) : n(n), pos(pos), worldPos(worldPos) {}
+			Output(const Vec4& pos) : pos(pos) {}
+			Output(const Vec4& pos, const Output& src) : n(src.n), worldPos(src.worldPos), pos(pos) {}
+			Output(const Vec4& pos, const Vec3& n, const Vec3& worldPos) : n(n), pos(pos), worldPos(worldPos) {}
 			Output& operator+=(const Output& rhs)
 			{
 				pos += rhs.pos;
@@ -76,27 +76,34 @@ public:
 				return Output(*this) /= rhs;
 			}
 		public:
-			Vec3 pos;
+			Vec4 pos;
 			Vec3 n;
 			Vec3 worldPos;
 		};
 	public:
-		void BindRotation(const Mat3& rotation_in)
+		void BindWorld(const Mat4& transformation_in)
 		{
-			rotation = rotation_in;
+			world = transformation_in;
+			worldProj = world * proj;
 		}
-		void BindTranslation(const Vec3& translation_in)
+		void BindProjection(const Mat4& transformation_in)
 		{
-			translation = translation_in;
+			proj = transformation_in;
+			worldProj = world * proj;
+		}
+		const Mat4& GetProj() const
+		{
+			return proj;
 		}
 		Output operator()(const Vertex& v) const
 		{
-			const auto pos = v.pos * rotation + translation;
-			return{ pos,v.n * rotation,pos };
+			const auto p4 = Vec4(v.pos);
+			return { p4 * worldProj,Vec4{ v.n,0.0f } *world,p4 * world };
 		}
 	private:
-		Mat3 rotation;
-		Vec3 translation;
+		Mat4 world = Mat4::Identity();
+		Mat4 proj = Mat4::Identity();
+		Mat4 worldProj = Mat4::Identity();
 	};
 	// default gs passes vertices through and outputs triangle
 	typedef DefaultGeometryShader<VertexShader::Output> GeometryShader;
