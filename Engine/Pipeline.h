@@ -76,8 +76,98 @@ private:
 	void ProcessTriangle(const VSOut& v0, const VSOut& v1, const VSOut& v2, size_t triangle_index)
 	{
 		// generate triangle from 3 vertices using gs
-		// and send to post-processing
-		PostProcessTriangleVertices(effect.gs(v0, v1, v2, triangle_index));
+		// and send to clipper
+		ClipCullTriangle(effect.gs(v0, v1, v2, triangle_index));
+	}
+
+	void ClipCullTriangle(Triangle<GSOut>& t)
+	{
+		// cull tests
+		if (t.v0.pos.x > t.v0.pos.w && t.v1.pos.x > t.v1.pos.w && t.v2.pos.x > t.v2.pos.w)
+		{
+			return;
+		}
+		if (t.v0.pos.x < -t.v0.pos.w && t.v1.pos.x < -t.v1.pos.w && t.v2.pos.x < -t.v2.pos.w)
+		{
+			return;
+		}
+		if (t.v0.pos.y > t.v0.pos.w && t.v1.pos.y > t.v1.pos.w && t.v2.pos.y > t.v2.pos.w)
+		{
+			return;
+		}
+		if (t.v0.pos.y < -t.v0.pos.w && t.v1.pos.y < -t.v1.pos.w && t.v2.pos.y < -t.v2.pos.w)
+		{
+			return;
+		}
+		if (t.v0.pos.z > t.v0.pos.w && t.v1.pos.z > t.v1.pos.w && t.v2.pos.z > t.v2.pos.w)
+		{
+			return;
+		}
+		if (t.v0.pos.z < 0.0f && t.v1.pos.z < 0.0f && t.v2.pos.z < 0.0f)
+		{
+			return;
+		}
+
+		// clipping routines
+		const auto Clip1 = [this](GSOut& v0, GSOut& v1, GSOut& v2)
+		{
+			// calculate alpha values for getting adjusted vertices
+			const float alphaA = (-v0.pos.z) / (v1.pos.z - v0.pos.z);
+			const float alphaB = (-v0.pos.z) / (v2.pos.z - v0.pos.z);
+			// interpolate to get v0a and v0b
+			const auto v0a = interpolate(v0, v1, alphaA);
+			const auto v0b = interpolate(v0, v2, alphaB);
+			// draw triangles
+			PostProcessTriangleVertices(Triangle<GSOut>{ v0a, v1, v2 });
+			PostProcessTriangleVertices(Triangle<GSOut>{ v0b, v0a, v2 });
+		};
+		const auto Clip2 = [this](GSOut& v0, GSOut& v1, GSOut& v2)
+		{
+			// calculate alpha values for getting adjusted vertices
+			const float alpha0 = (-v0.pos.z) / (v2.pos.z - v0.pos.z);
+			const float alpha1 = (-v1.pos.z) / (v2.pos.z - v1.pos.z);
+			// interpolate to get v0a and v0b
+			v0 = interpolate(v0, v2, alpha0);
+			v1 = interpolate(v1, v2, alpha1);
+			// draw triangles
+			PostProcessTriangleVertices(Triangle<GSOut>{ v0, v1, v2 });
+		};
+
+		// near clipping tests
+		if (t.v0.pos.z < 0.0f)
+		{
+			if (t.v1.pos.z < 0.0f)
+			{
+				Clip2(t.v0, t.v1, t.v2);
+			}
+			else if (t.v2.pos.z < 0.0f)
+			{
+				Clip2(t.v0, t.v2, t.v1);
+			}
+			else
+			{
+				Clip1(t.v0, t.v1, t.v2);
+			}
+		}
+		else if (t.v1.pos.z < 0.0f)
+		{
+			if (t.v2.pos.z < 0.0f)
+			{
+				Clip2(t.v1, t.v2, t.v0);
+			}
+			else
+			{
+				Clip1(t.v1, t.v0, t.v2);
+			}
+		}
+		else if (t.v2.pos.z < 0.0f)
+		{
+			Clip1(t.v2, t.v0, t.v1);
+		}
+		else // no near clipping necessary
+		{
+			PostProcessTriangleVertices(t);
+		}
 	}
 	// vertex post-processing function
 	// perform perspective and viewport transformations
@@ -180,8 +270,8 @@ private:
 		auto itEdge0 = it0;
 
 		// calculate start and end scanlines
-		const int yStart = (int)ceil(it0.pos.y - 0.5f);
-		const int yEnd = (int)ceil(it2.pos.y - 0.5f); // the scanline AFTER the last line drawn
+		const int yStart = std::max((int)ceil(it0.pos.y - 0.5f), 0);
+		const int yEnd = std::min((int)ceil(it2.pos.y - 0.5f), (int)Graphics::ScreenHeight - 1); // the scanline AFTER the last line drawn
 
 		// do interpolant prestep
 		itEdge0 += dv0 * (float(yStart) + 0.5f - it0.pos.y);
@@ -190,8 +280,8 @@ private:
 		for (int y = yStart; y < yEnd; y++, itEdge0 += dv0, itEdge1 += dv1)
 		{
 			// calculate start and end pixels
-			const int xStart = (int)ceil(itEdge0.pos.x - 0.5f);
-			const int xEnd = (int)ceil(itEdge1.pos.x - 0.5f); // the pixel AFTER the last pixel drawn
+			const int xStart = std::max((int)ceil(itEdge0.pos.x - 0.5f), 0);
+			const int xEnd = std::min((int)ceil(itEdge1.pos.x - 0.5f), (int)Graphics::ScreenWidth - 1); // the pixel AFTER the last pixel drawn
 
 			// create scanline interpolant startpoint
 			// (some waste for interpolating x,y,z, but makes life easier not having
